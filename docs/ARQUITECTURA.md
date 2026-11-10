@@ -1,0 +1,21 @@
+# Arquitectura
+
+## Capas
+
+- **UI:** Jetpack Compose para bienvenida de primera apertura, onboarding, tutorial repetible, inicio, perfil, mensaje/foto, medicamentos, contactos, sensor, ajustes y modo de emergencia. La navegación usa un desvanecido corto y progreso animado del tutorial.
+- **Dominio:** `ShakeDetectorLogic`, independiente de Android, con configuración y estado temporal propios.
+- **Servicios Android:** `MonitoringService` registra y libera el acelerómetro tras una acción explícita. Usa una notificación persistente y una notificación de emergencia de prioridad alta con pantalla completa para solicitar la presentación desde segundo plano.
+- **Datos:** `ProfileRepository` cifra perfil, instrucciones y contactos con AES/GCM y una clave Android Keystore. `EmergencyPhotoRepository` importa, redimensiona y cifra la foto con clave AES/GCM separada. Ambos quedan en `noBackupFilesDir`; `allowBackup=false`.
+- **Voz:** `TextToSpeech` del sistema se inicializa de forma asíncrona en la Activity de emergencia; la pantalla no espera al motor. Las preferencias locales incluyen voz/idioma, velocidad, tono, orden y campos incluidos.
+
+## Flujo de emergencia
+
+Monitoreo iniciado por la persona → lecturas del acelerómetro → filtro de gravedad y validación temporal → notificación local de emergencia y alarma → `EmergencyActivity` sobre pantalla bloqueada cuando Android lo permite → perfil e instrucciones locales → pulsación sostenida de cinco segundos para finalizar.
+
+Si se configuró TTS, la lectura empieza cuando el motor del sistema está listo; detener o repetir está disponible en pantalla. Si falta idioma/voz o la voz requiere una conexión no disponible, la presentación visual sigue siendo la fuente local.
+
+La notificación de pantalla completa usa las APIs públicas de Android y no elimina la autenticación del teléfono. El servicio no declara reinicio permanente. No se añaden llamadas automáticas, SMS, GPS, red, analítica ni nube.
+
+## Persistencia y privacidad
+
+El perfil no se imprime en logs. La clave nunca se guarda en el repositorio. El modo de simulación muestra una etiqueta persistente y no inicia el servicio ni la alarma. La imagen se selecciona con Photo Picker y se copia cifrada sin conservar un URI externo. La agenda utiliza ACTION_PICK para seleccionar un número; no se solicita permiso general `READ_CONTACTS`.
