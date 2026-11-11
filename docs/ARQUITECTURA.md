@@ -18,4 +18,14 @@ La notificación de pantalla completa usa las APIs públicas de Android y no eli
 
 ## Persistencia y privacidad
 
+## Captura inercial 0.1.1
+
+`MotionSensorPolicy` centraliza selección wake-up y entrega con FIFO para `MonitoringService` y diagnóstico; no comparte acciones de emergencia. La lógica pura conserva filtro de gravedad dependiente del tiempo, valida dos impulsos relacionados por dirección y tiempo y rechaza rebotes/vibraciones y caída libre. El diagnóstico limita publicaciones visuales a ~10 Hz, conserva la última métrica aceptada y libera su listener en ON_STOP. No se incorporan bibliotecas externas ni wake lock propio. Detalles y limitaciones: `ANALISIS_CHOP_CHOP.md`.
+
 El perfil no se imprime en logs. La clave nunca se guarda en el repositorio. El modo de simulación muestra una etiqueta persistente y no inicia el servicio ni la alarma. La imagen se selecciona con Photo Picker y se copia cifrada sin conservar un URI externo. La agenda utiliza ACTION_PICK para seleccionar un número; no se solicita permiso general `READ_CONTACTS`.
+
+## Guía y apariencia 0.1.7
+
+`TutorialScreen` conserva el paso durante la recreación y devuelve al origen al salir. `GestureDemonstration` dibuja dos paneles en Compose y reproduce una secuencia local a petición. La práctica usa la rama guiada de `DetectorDiagnosticScreen`, que comparte la política del sensor y la sensibilidad seleccionada con el diagnóstico. La pantalla de práctica requiere una acción explícita para escuchar y libera el listener al salir o pasar a segundo plano.
+
+`MainActivity` guarda la apariencia Sistema, Claro u Oscuro en las preferencias privadas `impulsos-ui`. Los colores normales provienen de `ImpulSOSTheme`. La actividad de emergencia y su simulación conservan la paleta de emergencia.

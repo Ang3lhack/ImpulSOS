@@ -64,7 +64,7 @@ fun SpeechSettingsScreen() {
 
     Card(colors = CardDefaults.cardColors(containerColor = androidx.compose.ui.graphics.Color.White), shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("Lectura por voz en emergencia", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = androidx.compose.ui.graphics.Color(0xFF191A32))
+            Text("Lectura por voz en emergencia", fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Text("Usa TextToSpeech instalado en Android. No retrasa la pantalla visual y no comparte datos con ImpulSOS.", fontSize = 14.sp)
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Leer automáticamente")

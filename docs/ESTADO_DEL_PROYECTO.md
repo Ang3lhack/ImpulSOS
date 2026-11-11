@@ -1,6 +1,12 @@
 # Estado del proyecto
 
-**Iteración actual:** APK debug instalada en Motorola one Android 10/API 29. Galería, persistencia cifrada y presentación de la foto en pantalla de emergencia se probaron en la app. La prueba de cámara y la lectura física del sensor requieren acción en el teléfono; esta última está bloqueada mientras el estado de monitoreo normal figure activo.
+## Registro previo del detector — 2026-11-10, revisión 0.1.2
+
+La secuencia física sin USB de 0.1.1 no se reconoció: cero patrones, 19 ms entre muestras. No se conoce la causa porque Detener borraba el estado del rechazo. Se instaló 0.1.2 (code 3) para conservar intensidad máxima y 12 eventos/rechazos; no se cambiaron parámetros de detección en esta revisión. 23 pruebas unitarias aprobadas y assembleDebug correcto. Firma verificada; instalación Success; `lastUpdateTime=2026-11-10 08:20:15`; SHA-256 `8F63507F018C478B900FA89426B8D6EF40BDE78281E5825618154F5BEAFACFBA`, 7,974,376 bytes.
+
+En teléfono, la señal sintética reconoció cuatro patrones; los intervalos aceptados conservados fueron 240–260 ms, máxima dinámica 4.38 m/s². Al detener, el resumen permaneció y se imprimió identificado como sintético. Sin servicio MonitoringService activo. No cuenta como calibración física. Se preparó diagnóstico físico detenido y se solicitó repetir un gesto sin USB. La activación y el consumo aún requieren validación física; no se afirma solución definitiva ni ahorro medido.
+
+El estado de detector y validación más reciente aparece en «Detector chop-chop — revisión 0.1.3» al final de este documento; este registro describe la compilación anterior.
 
 ## Verificado (2026-11-07)
 
@@ -61,7 +67,7 @@ El Photo Picker quedó cancelado. El monitoreo normal permanece pausado por la a
 
 ## Continuación — 2026-11-10
 
-- Motorola `ZY323D6MSV` respondió como `device`; la APK instalada seguía en versionCode 1, versionName 0.1.0, `lastUpdateTime=2026-11-07 15:38:26`.
+- Motorola one respondió como `device`; la APK instalada seguía en versionCode 1, versionName 0.1.0, `lastUpdateTime=2026-11-07 15:38:26`.
 - Al iniciar esta sesión, el almacenamiento privado ya contenía `emergency-photo.bin` (23,269 bytes; fecha 2026-11-09 10:21) y `medical-profile.bin`. La causa/origen del guardado que ocurrió entre sesiones no se infiere. La imagen cargó en el editor con la descripción accesible de foto guardada.
 - La simulación identificada mostró `SIMULACIÓN · NO ES UNA EMERGENCIA REAL` y «Fotografía de referencia elegida por la persona». No se observó `MonitoringService` ejecutándose ni se activó alarma real.
 - Se repitió cámara en la APK instalada: abrir desde el editor → cámara Motorola → captura real → vista previa de ImpulSOS → confirmar Guardar. El archivo privado cambió a 65,110 bytes a las 07:18 (hora del teléfono); temporal de 2,464,233 bytes se borró del directorio `cache/impulsos-camera` tras guardar.
@@ -81,3 +87,34 @@ Actualización al cierre del 2026-11-10: se forzó de verdad `testDebugUnitTest 
 - Cancelación real de cámara en APK actual: con `medicamento.jpeg` guardada, se abrió la cámara externa y se volvió atrás sin capturar. La temporal vacía desapareció, el blob anterior permaneció en 23,269 bytes y el editor siguió indicando foto guardada. Se comprobó por tanto conservación al cancelar.
 - Una captura de cámara real y el reemplazo de `medicamento.jpeg` han sido probados en APK actual; el borrado se había comprobado previamente en esta misma APK y devolvió el editor al estado vacío sin bitmap anterior.
 - ADB estaba conectado al cierre. No se registraron pruebas físicas nuevas del gesto en esta continuación; el protocolo amplio de movimientos cotidianos/latencia continúa pendiente.
+
+### Detector chop-chop — revisión 0.1.3, continuación 2026-11-10
+
+- Se instaló la APK `com.impulsos.app`, versionCode 4 / versionName 0.1.3, manteniendo los datos; `lastUpdateTime=2026-11-10 08:33:37`. APK de 7,975,604 bytes, SHA-256 `B9B55D9E87C612ADA090C1D49E2DD9443624E80340B2A2039E6C6610E615BF7E`. `MainActivity` abierta sin excepción fatal observada.
+- La prueba física previa de 0.1.2 mostró un impulso a 75 ms y el candidato a 205 ms rechazado con separación 130 ms. La 0.1.3 cambia el umbral relativo del valle, no los umbrales de intensidad ni los 200 ms mínimos. La nueva sesión sí registró patrones físicos, pero hubo movimientos adicionales y no permite concluir sensibilidad ni falsos positivos.
+- Suite unitaria: 27/27 aprobada; 21 del detector, 4 de contactos y 2 de sesión diagnóstica. Señal sintética en Motorola: 4 patrones aceptados, intervalos de 240 y 260 ms, rebotes de 120 y 140 ms, pico dinámico 4.38 m/s². Sin `MonitoringService` activo.
+- Diagnóstico físico 0.1.3: intervalo de muestras 19 ms; máximo dinámico 98.79 m/s²; dos patrones aceptados con intervalos 579 y 225 ms; dos candidatos descartados por dirección (318 y 504 ms). Entrega sensor-a-callback de 73–74 ms para las aceptaciones observadas; no es latencia total de emergencia.
+- El usuario informó que hubo otros movimientos en la sesión. No es posible adjudicar las aceptaciones exclusivamente a los dos tajos ni estimar falsos positivos/negativos. Se detuvo el listener antes de reconectar; `MonitoringService` permaneció ausente y no hubo alarma/emergencia real.
+- Para cerrar la sesión se abrió y detuvo el lector físico sin hacer nuevos gestos: última lectura 18 ms entre muestras, dinámica máxima 0.38 m/s², cero patrones y fuente inactiva. No aparece servicio de monitoreo. Después ImpulSOS se cerró con `am force-stop` sin borrar datos; el teléfono estaba reconectado por ADB.
+- No se hizo otro build o instalación tras la prueba. Los documentos vigentes son README, este estado y `docs/PLAN_DE_PRUEBAS.md`; para retomar: iniciar con las limitaciones de atribución física y batería, ejecutar una prueba estructurada solo cuando el usuario tenga tiempo y mantener Diagnóstico seguro (nunca emergencia real).
+- Cierre de entorno: servidor ADB apagado con `adb kill-server`; daemon Gradle detenido con `gradlew --stop`; verificación final sin procesos ADB, emulador ni Gradle/Java. En el último intento de limpieza ADB respondió `no devices/emulators found`; por ello no se comprobó si sigue en el teléfono el volcado temporal de jerarquía `/sdcard/window.xml` generado durante la inspección de la pantalla de diagnóstico. No contiene una lectura médica.
+- `adb` no inicia desde el sandbox por fallo local de `fdevent socketpair`; ejecutar ADB en una única sesión local permitió verificar el dispositivo y su pantalla. No se cambió ninguna configuración del teléfono.
+- Consumo de batería, variación en actividades cotidianas, falsos positivos/negativos y latencia completa hasta emergencia siguen sin medir. No hubo alarma ni emergencia real.
+
+### Historial de Diagnóstico seguro — 0.1.4, 2026-11-11
+
+Se compiló e instaló la versión 0.1.4 (código 5) en el Motorola. Pasaron 30 pruebas unitarias. El diagnóstico conserva en la pantalla hasta ocho resúmenes de lecturas físicas detenidas manualmente y permite copiarlos juntos. En el teléfono se verificaron la pantalla de historial vacío, la fuente inactiva y la ausencia del servicio de monitoreo. Queda pendiente el bloque físico de cuatro ensayos y la comprobación de su copia. Ver el procedimiento y los metadatos de la APK en `docs/PLAN_DE_PRUEBAS.md`.
+
+### Ajuste del detector — 0.1.5, 2026-11-11
+
+El historial físico de 0.1.4 registró `1, 1, 3, 4, 1, 0, 0, 2` patrones en los ocho ensayos. La 0.1.5 exige dos crestas confirmadas, usa un piso experimental de 28 m/s² en modo equilibrado y mide el intervalo entre sus máximos. Pasaron 34 pruebas unitarias. ADB confirmó la instalación de 0.1.5 (código 6), apertura correcta y Diagnóstico seguro detenido. Falta repetir los ensayos dirigidos con 0.1.5 y medir el consumo. Los datos del bloque anterior quedaron en `docs/PLAN_DE_PRUEBAS.md`.
+
+### Verificación de 0.1.5 y guarda de caída de 0.1.6 — 2026-11-11
+
+El bloque de cinco pruebas produjo `0, 1, 0, 0, 0`. Se reconoció el doble tajo moderado y se rechazaron las tres actividades cotidianas. El tajo natural se perdió en una sesión que registró bloqueo por posible caída. La 0.1.6 exige persistencia de la baja aceleración antes de descartar el gesto y conserva 800 ms de protección tras confirmar. Pasaron 36 pruebas y ADB confirmó la instalación de 0.1.6 (código 7).
+
+El historial físico de 0.1.6 confirmó `1, 1, 0` para dos dobles tajos naturales y manipulación habitual. Los intervalos fueron 489 y 471 ms. Diagnóstico seguro quedó abierto y detenido, con el servicio de monitoreo ausente. Se conserva esta versión del detector para medir batería, comportamiento con la pantalla bloqueada y latencia de apertura mediante una ruta segura.
+
+### Guía paso a paso y apariencia — 0.1.7
+
+La guía conserva diez pasos e incorpora la demostración reproducible del doble tajo, la entrada directa desde Sensor, la práctica sin alarma y un acceso a la simulación de emergencia. Ajustes permite elegir Sistema, Claro u Oscuro. En el Motorola se recorrieron los diez pasos y se comprobó la persistencia del modo oscuro tras volver a abrir la aplicación. La práctica guiada abrió con el sensor detenido. Su reconocimiento físico, TalkBack y la verificación en el dispositivo con animaciones desactivadas siguen pendientes.

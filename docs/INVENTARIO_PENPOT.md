@@ -28,3 +28,11 @@ Archivo conectado por MCP: `Aplicacion (copia)`. Inspección de lectura; no se m
 ## Reconsulta MCP — 2026-11-07
 
 La sesión MCP responde en vivo: archivo `Aplicacion (copia)`, página actual `02 — Onboarding`; `currentFile.pages` enumeró 13 páginas y sus identificadores, coincidentes con la tabla anterior. Esta consulta confirmó conexión y disponibilidad de metadatos de página; la exportación visual de las 13 páginas y la inspección estructural documentadas arriba corresponden a la consulta previa. El MCP no implica que se modificara el documento.
+
+## Historial de Diagnóstico seguro — 2026-11-11
+
+Penpot MCP indicó que no había una instancia conectada. El historial se añadió como extensión provisional de la pantalla de diagnóstico, con referencia al inventario de **01 — Design System** y **10 — Sensor**. Usa la tipografía y los botones Material 3 del tema existente, con una altura mínima de 54 dp para Leer sensor, Detener y Copiar historial.
+
+## Tutorial y apariencia — 0.1.7
+
+La consulta MCP volvió a indicar que no había una instancia conectada. Se usó el inventario de **01 — Design System**, **02 — Onboarding**, **10 — Sensor** y **11 — Settings**. La guía conserva los diez temas y adapta la explicación del doble tajo en dos paneles ilustrados. La práctica y el tema oscuro son extensiones provisionales de producto. Mantienen Roboto, violeta y lima. La vista de emergencia conserva el rojo y su contraste dedicado.

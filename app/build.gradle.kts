@@ -11,8 +11,8 @@ android {
         applicationId = "com.impulsos.app"
         minSdk = 26
         targetSdk = 29
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 8
+        versionName = "0.1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

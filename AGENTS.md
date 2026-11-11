@@ -102,6 +102,7 @@ Documentar qué se probó realmente y qué permanece pendiente.
 - Diseñar estados vacíos, carga, éxito, error y operación; indicar qué ocurrió y cómo resolver errores.
 - La emergencia tiene prioridad; no hacer que animaciones, red, TTS ni accesos opcionales retrasen la vista médica.
 - Respetar escalado de texto y reducir o eliminar movimiento cuando el usuario lo solicite o el sistema indique animaciones reducidas.
+- La demostración del gesto se reproduce a petición y debe conservar una alternativa estática con instrucciones completas. El tema de navegación respeta la opción Sistema, Claro u Oscuro. La pantalla de emergencia conserva su paleta dedicada.
 - Medir contraste antes de declarar cumplimiento WCAG o APCA. No presentar metas editoriales de APCA como norma universal sin fuente y contexto verificados.
 
 ## Seguridad, contenido médico y privacidad
@@ -149,11 +150,14 @@ No instalar Gradle global si el Wrapper está presente. No cambiar configuració
 
 ## Diagnóstico seguro de movimiento
 
+- Detener la lectura debe conservar las métricas y motivos de rechazo de la sesión. Reiniciar el resumen solo al iniciar una nueva prueba; limitar el historial en memoria y no registrar datos médicos ni traza cruda continua.
+
 - El recorrido de producción (`MonitoringService`) y `DetectorDiagnosticScreen` deben permanecer separados. El diagnóstico no puede iniciar `EmergencyActivity`, crear notificaciones de emergencia ni reproducir alarma.
 - Antes de instalar una APK, ejecutar pruebas unitarias y compilación. Verificar código/versión/hash del artefacto, resultado explícito de `adb install`, `lastUpdateTime` y apertura sin excepción.
 - Para medir el sensor, registrar timestamps de `SensorEvent`; el periodo pedido al sistema no garantiza la frecuencia real recibida.
 - La simulación del detector se etiqueta como señal sintética. No cuenta como prueba física ni como calibración.
 - No activar el monitoreo normal para pruebas de movimiento salvo que una ruta segura esté demostrada sin alarma.
+- La práctica guiada comparte el detector del diagnóstico seguro y usa la sensibilidad seleccionada. Debe requerir inicio explícito, respetar el monitoreo pausado y liberar el sensor al salir o pasar a segundo plano.
 
 ## Fotografías locales
 
@@ -179,6 +183,14 @@ No instalar Gradle global si el Wrapper está presente. No cambiar configuració
 - Si el árbol de accesibilidad del selector del sistema no está disponible, no seleccionar elementos por coordenadas supuestas cuando pueda haber fotos personales; pedir al usuario que elija el archivo de prueba indicado y continuar al volver a la app.
 
 ## Inventario de Skills host
+
+## Detector doble tajo y energía (0.1.1)
+
+- Mantener `MotionSensorPolicy` compartida por diagnóstico y servicio: acelerómetro wake-up si existe, 20 ms solicitados y batching máximo de 100 ms con FIFO; documentar la limitación de suspensión del fallback normal.
+- No introducir wake locks prolongados ni condiciones obligatorias de oscuridad, proximidad o bloqueo de pantalla tomadas de linternas sin analizar su impacto en emergencias.
+- La comparación de consumo requiere una medición A/B reproducible; FIFO configurado, ausencia de wake lock propio y pruebas de unidad no demuestran autonomía ni ahorro porcentual.
+- Conservar los 17 casos originales del detector/contactos y los nuevos casos de muestras inválidas, periodos de muestreo, rebote y dirección. Registrar valores reales del gesto y separar demora del callback de latencia hasta emergencia.
+- Fuentes y parámetros experimentales: `docs/ANALISIS_CHOP_CHOP.md`.
 
 - El inventario de Skills debe separar `.agents/skills/` del proyecto y las Skills instaladas en rutas host (`.codex/skills`, plugins y runtimes). No declarar “nueva” sin una instantánea temporal de comparación.
 - Registrar `utilizada` solo para las Skills cuyas instrucciones se leyeron y cuyo criterio se aplicó en una tarea verificable. Listar no equivale a utilizar.

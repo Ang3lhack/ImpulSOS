@@ -30,12 +30,12 @@ class MonitoringService : Service(), SensorEventListener {
     private var detector = ShakeDetectorLogic()
     private var alarm: ToneGenerator? = null
     private val handler = Handler(Looper.getMainLooper())
-    private var lastTriggerAt = 0L
+    private var lastTriggerAt: Long? = null
 
     override fun onCreate() {
         super.onCreate()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        accelerometer = MotionSensorPolicy.sensor(sensorManager)
         createNotificationChannels()
     }
 
@@ -57,12 +57,13 @@ class MonitoringService : Service(), SensorEventListener {
             stopSelf()
             return
         }
-        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_ACTIVE, true).apply()
         startForeground(NOTIFICATION_ID, monitoringNotification())
         detector = newDetector()
         sensorManager.unregisterListener(this)
         // Request a steadier cadence for peak timestamps; Android may still batch/throttle it.
-        sensorManager.registerListener(this, sensor, 20_000)
+        val registered = sensorManager.registerListener(this, sensor, MotionSensorPolicy.SAMPLE_PERIOD_US, MotionSensorPolicy.latency(sensor))
+        getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(KEY_ACTIVE, registered).apply()
+        if (!registered) stopMonitoring()
     }
 
     private fun stopMonitoring() {
@@ -89,7 +90,7 @@ class MonitoringService : Service(), SensorEventListener {
         alarm = null
         getSystemService(NotificationManager::class.java).cancel(EMERGENCY_NOTIFICATION_ID)
         detector.reset()
-        accelerometer?.let { sensorManager.registerListener(this, it, 20_000) }
+        if (isActive(this)) startMonitoring() else stopMonitoring()
     }
 
     override fun onDestroy() {
@@ -112,7 +113,7 @@ class MonitoringService : Service(), SensorEventListener {
 
     private fun activateEmergency() {
         val now = SystemClock.elapsedRealtime()
-        if (now - lastTriggerAt < TRIGGER_COOLDOWN_MILLIS) return
+        if (lastTriggerAt?.let { now - it < TRIGGER_COOLDOWN_MILLIS } == true) return
         lastTriggerAt = now
         detector.reset()
         sensorManager.unregisterListener(this)
