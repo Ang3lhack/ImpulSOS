@@ -358,5 +358,3 @@ Rutas relativas a `app/src/main/java/com/impulsos/app/`.
 | `docs/assets/` | Isotipo y capturas documentales del Motorola. |
 
 El perfil y la foto se guardan en almacenamiento privado, excluido de copias de seguridad. La app carece de permisos de Internet, llamadas, SMS, ubicación y acceso general a contactos o almacenamiento. Para pruebas, informes y capturas se usan datos ficticios.
-
-La estructura del informe toma como referencia la introducción, el recorrido visual, los diagramas y la evidencia reproducible de [Agent Court](https://github.com/Ang3lhack/Agent_court). La implementación y los resultados de ImpulSOS se basan en su código y en las pruebas descritas en este repositorio.
